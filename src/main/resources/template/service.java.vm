@@ -1,0 +1,16 @@
+package ${package.Service};
+
+import ${package.Entity}.${entity};
+import ${superServiceClassPackage};
+import com.digital.framework.core.structure.Response;
+import com.digital.framework.core.base.SuperId;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import java.util.List;
+
+/**
+ * @author ${author}
+ * @since ${date}
+ */
+public interface ${table.serviceName} extends ${superServiceClass}<${entity}> {
+
+}

@@ -1,0 +1,26 @@
+package ${package.Entity};
+
+
+import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
+/**
+ * $!{table.comment}
+ * @author ${author}
+ * @since ${date}
+ */
+@Data
+@TableName("${schemaName}${table.name}")
+public class ${entity} {
+## ----------  BEGIN 字段循环遍历  ----------
+#foreach($field in ${table.fields})
+    #if(${ignoreFieldList.contains($field.propertyName)})
+        ## 如果是忽略字段什么都不干
+    #else
+    @ApiModelProperty("$!{field.comment}")
+    private ${field.propertyType} ${field.propertyName};
+    #end
+#end
+## ----------  END 字段循环遍历  ----------
+}
