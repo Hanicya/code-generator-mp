@@ -1,0 +1,72 @@
+package ${package.ServiceImpl};
+
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import lombok.extern.slf4j.Slf4j;
+import ${package.Entity}.${entity};
+import ${package.Mapper}.${table.mapperName};
+import ${packageVo}.${businessName}PageReqVO;
+import ${packageVo}.${businessName}PageRespVO;
+import ${packageVo}.${businessName}RespVO;
+import ${packageVo}.${businessName}SaveReqVO;
+import ${javaPrefix}.annotation.Resource;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+#set($mapperBeanName = $table.mapperName.substring(0,1).toLowerCase().concat($table.mapperName.substring(1)))
+
+/**
+ * @author ${author}
+ * @since ${date}
+ */
+@Slf4j
+@Service
+public class ${table.serviceImplName} implements ${table.serviceName} {
+
+    @Resource
+    private ${table.mapperName} ${mapperBeanName};
+
+    @Override
+    public PageResult<${businessName}PageRespVO> getPage(${businessName}PageReqVO reqVO) {
+        PageResult<${entity}> pageInfo = ${mapperBeanName}.selectPage(reqVO);
+        return BeanUtils.toBean(pageInfo, ${businessName}PageRespVO.class);
+    }
+
+    @Override
+    public ${businessName}RespVO get(Long id) {
+        ${entity} entity = ${mapperBeanName}.selectById(id);
+        return BeanUtils.toBean(entity, ${businessName}RespVO.class);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Long create(${businessName}SaveReqVO createReqVO) {
+        ${entity} entity = BeanUtils.toBean(createReqVO, ${entity}.class);
+        ${mapperBeanName}.insert(entity);
+
+        return entity.getId();
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void update(${businessName}SaveReqVO updateReqVO) {
+        validateExists(updateReqVO.getId());
+        ${entity} entity = BeanUtils.toBean(updateReqVO, ${entity}.class);
+        ${mapperBeanName}.updateById(entity);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void delete(Long id) {
+        validateExists(id);
+        ${mapperBeanName}.deleteById(id);
+    }
+
+
+    private void validateExists(Long id) {
+        if (${mapperBeanName}.selectById(id) == null) {
+            throw exception(${businessNameUpper}_NOT_EXISTS);
+        }
+    }
+
+}

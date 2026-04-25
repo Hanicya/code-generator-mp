@@ -1,0 +1,54 @@
+-- 菜单 SQL
+    INSERT INTO system_menu(
+        name, permission, type, sort, parent_id,
+        path, icon, component, status, component_name
+    )
+    VALUES (
+               '$!{businessComment}管理', 'system:${pathAndPermission}:query', 2, 0, ${table.parentMenuId},
+               '${pathAndPermission}', '', '', 0, ''
+           );
+
+-- 按钮父菜单ID
+    SELECT @parentId := LAST_INSERT_ID();
+
+-- 按钮 SQL
+    INSERT INTO system_menu(
+        name, permission, type, sort, parent_id,
+        path, icon, component, status
+    )
+    VALUES (
+               '$!{businessComment}查询', 'system:${pathAndPermission}:query', 3, 1, @parentId,
+               '', '', '', 0
+           );
+    INSERT INTO system_menu(
+        name, permission, type, sort, parent_id,
+        path, icon, component, status
+    )
+    VALUES (
+               '$!{businessComment}创建', 'system:${pathAndPermission}:create', 3, 2, @parentId,
+               '', '', '', 0
+           );
+    INSERT INTO system_menu(
+        name, permission, type, sort, parent_id,
+        path, icon, component, status
+    )
+    VALUES (
+               '$!{businessComment}更新', 'system:${pathAndPermission}:update', 3, 3, @parentId,
+               '', '', '', 0
+           );
+    INSERT INTO system_menu(
+        name, permission, type, sort, parent_id,
+        path, icon, component, status
+    )
+    VALUES (
+               '$!{businessComment}删除', 'system:${pathAndPermission}:delete', 3, 4, @parentId,
+               '', '', '', 0
+           );
+    INSERT INTO system_menu(
+        name, permission, type, sort, parent_id,
+        path, icon, component, status
+    )
+    VALUES (
+               '$!{businessComment}导出', 'system:${pathAndPermission}:export', 3, 5, @parentId,
+               '', '', '', 0
+           );

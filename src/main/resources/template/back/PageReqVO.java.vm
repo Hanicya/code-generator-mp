@@ -1,0 +1,16 @@
+package ${packageVo};
+
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import lombok.Data;
+
+
+
+/**
+ * @author ${author}
+ * @since ${date}
+ */
+@Data
+public class ${businessName}PageReqVO extends PageParam {
+
+
+}

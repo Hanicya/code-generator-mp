@@ -1,0 +1,41 @@
+package ${package.Service};
+
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import ${packageVo}.${businessName}PageReqVO;
+import ${packageVo}.${businessName}PageRespVO;
+import ${packageVo}.${businessName}RespVO;
+import ${packageVo}.${businessName}SaveReqVO;
+import ${javaPrefix}.validation.Valid;
+
+/**
+ * @author ${author}
+ * @since ${date}
+ */
+public interface ${table.serviceName} {
+
+    /**
+     * 分页查询
+     */
+    PageResult<${businessName}PageRespVO> getPage(${businessName}PageReqVO reqVO);
+
+    /**
+     * 查询详情
+     */
+    ${businessName}RespVO get(Long id);
+
+    /**
+     * 创建
+     */
+    Long create(@Valid ${businessName}SaveReqVO createReqVO);
+
+    /**
+     * 更新
+     */
+    void update(@Valid ${businessName}SaveReqVO updateReqVO);
+
+    /**
+     * 删除
+     */
+    void delete(Long id);
+
+}

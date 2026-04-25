@@ -1,6 +1,0 @@
-/**
-* @author HuangYiCheng
-*/
-public class MyTest {
-    private ${fieldType} ${fieldName};
-}

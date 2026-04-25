@@ -1,0 +1,47 @@
+package ${packageVo};
+
+import lombok.Data;
+import io.swagger.v3.oas.annotations.media.Schema;
+#set($hasBigDecimal = false)
+#set($hasLocalDateTime = false)
+#set($hasLocalDate = false)
+#foreach($field in ${table.fields})
+    #if(!$ignoreFieldList.contains($field.propertyName))
+        #if("$field.propertyType" == "BigDecimal")
+            #set($hasBigDecimal = true)
+        #end
+        #if("$field.propertyType" == "LocalDateTime")
+            #set($hasLocalDateTime = true)
+        #end
+        #if("$field.propertyType" == "LocalDate")
+            #set($hasLocalDate = true)
+        #end
+    #end
+#end
+#if($hasBigDecimal)
+import java.math.BigDecimal;
+#end
+#if($hasLocalDateTime)
+import java.time.LocalDateTime;
+#end
+#if($hasLocalDate)
+import java.time.LocalDate;
+#end
+
+/**
+ * @author ${author}
+ * @since ${date}
+ */
+@Data
+public class ${businessName}RespVO {
+
+#foreach($field in ${table.fields})
+    #if(${ignoreFieldList.contains($field.propertyName)})
+        ## ignore base fields
+    #else
+    @Schema(description = "$!{field.comment}")
+    private ${field.propertyType} ${field.propertyName};
+
+    #end
+#end
+}

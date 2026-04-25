@@ -1,0 +1,93 @@
+package ${package.Controller};
+
+import ${package.Service}.${table.serviceName};
+import ${javaPrefix}.validation.*;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
+import org.springframework.web.bind.annotation.*;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+import javax.servlet.http.HttpServletResponse;
+import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
+import org.springframework.validation.annotation.Validated;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
+import ${javaPrefix}.annotation.Resource;
+import org.springframework.web.bind.annotation.RequestBody;
+import io.swagger.v3.oas.annotations.Operation;
+import org.springframework.web.bind.annotation.RequestMapping;
+import java.io.IOException;
+import java.util.List;
+import ${packageVo}.${businessName}PageReqVO;
+import ${packageVo}.${businessName}PageRespVO;
+import ${packageVo}.${businessName}RespVO;
+import ${packageVo}.${businessName}SaveReqVO;
+
+/**
+ * @author ${author}
+ * @since ${date}
+ */
+@Tag(name = "管理后台 - $!{businessComment}")
+@RestController
+@RequestMapping("/system/${pathAndPermission}")
+@Validated
+public class ${table.controllerName} {
+
+    @Resource
+    private ${table.serviceName} service;
+
+    @GetMapping("/page")
+    @Operation(summary = "获得$!{businessComment}分页")
+    @PreAuthorize("@ss.hasPermission('system:${pathAndPermission}:query')")
+    public CommonResult<PageResult<${businessName}PageRespVO>> getPage(@Valid ${businessName}PageReqVO pageReqVO){
+        return success(service.getPage(pageReqVO));
+    }
+
+    @GetMapping("/get")
+    @Operation(summary = "获得$!{businessComment}详情")
+    @PreAuthorize("@ss.hasPermission('system:${pathAndPermission}:query')")
+    public CommonResult<${businessName}RespVO> get(@RequestParam("id") Long id) {
+        return success(service.get(id));
+    }
+
+
+
+    @PostMapping("/create")
+    @Operation(summary = "创建$!{businessComment}")
+    @PreAuthorize("@ss.hasPermission('system:${pathAndPermission}:create')")
+    public CommonResult<Long> create(@Valid @RequestBody ${businessName}SaveReqVO createReqVO) {
+        return success(service.create(createReqVO));
+    }
+
+    @PutMapping("/update")
+    @Operation(summary = "更新$!{businessComment}")
+    @PreAuthorize("@ss.hasPermission('system:${pathAndPermission}:update')")
+    public CommonResult<Boolean> update(@Valid @RequestBody ${businessName}SaveReqVO updateReqVO) {
+        service.update(updateReqVO);
+        return success(true);
+    }
+
+    @DeleteMapping("/delete")
+    @Operation(summary = "删除$!{businessComment}")
+    @PreAuthorize("@ss.hasPermission('system:${pathAndPermission}:delete')")
+    public CommonResult<Boolean> delete(@RequestParam("id") Long id){
+        service.delete(id);
+        return success(true);
+    }
+
+    @GetMapping("/export-excel")
+    @Operation(summary = "导出$!{businessComment}Excel")
+    @PreAuthorize("@ss.hasPermission('system:${pathAndPermission}:export')")
+    @ApiAccessLog(operateType = EXPORT)
+    public void exportExcel(@Valid ${businessName}PageReqVO pageReqVO, HttpServletResponse response) throws IOException {
+        pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
+        List<${businessName}PageRespVO> list = service.getPage(pageReqVO).getList();
+        // 导出 Excel
+        ExcelUtils.write(response, "$!{businessComment}.xls", "数据", ${businessName}PageRespVO.class, list);
+    }
+
+}

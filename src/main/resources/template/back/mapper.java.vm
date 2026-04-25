@@ -1,0 +1,22 @@
+package ${package.Mapper};
+
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import ${package.Entity}.${entity};
+import ${packageVo}.${businessName}PageReqVO;
+import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import org.apache.ibatis.annotations.Mapper;
+
+
+/**
+* @author ${author}
+* @since ${date}
+*/
+@Mapper
+public interface ${table.mapperName} extends BaseMapperX<${entity}> {
+
+    default PageResult<${entity}> selectPage(${businessName}PageReqVO reqVO) {
+        return selectPage(reqVO, new LambdaQueryWrapperX<${entity}>()
+        .orderByDesc(${entity}::getId));
+    }
+}
