@@ -1,0 +1,56 @@
+import request from '@/config/axios'
+import type { Dayjs } from 'dayjs';
+
+
+/** $!{businessComment} */
+export interface ${businessName} {
+
+    #foreach($field in ${table.fields})
+        #if(${ignoreFieldList.contains($field.propertyName)})
+            ## 如果是忽略字段什么都不干
+        #else
+            #if(${field.propertyType} == "Long" || ${field.propertyType} == "Integer" || ${field.propertyType} == "Short" || ${field.propertyType} == "Double" || ${field.propertyType} == "BigDecimal")
+    ${field.propertyName}#if($field.metaInfo.nullable)?#end: number; // $!{field.comment}
+            #elseif(${field.propertyType} == "Date" || ${field.propertyType} == "LocalDate" || ${field.propertyType} == "LocalDateTime")
+    ${field.propertyName}#if($field.metaInfo.nullable)?#end: string | Dayjs; // ${field.comment}
+            #else
+    ${field.propertyName}#if($field.metaInfo.nullable)?#end: ${field.propertyType.toLowerCase()}; // $!{field.comment}
+            #end
+        #end
+    #end
+}
+
+// $!{businessComment} API
+export const ${businessName}Api = {
+    // 查询分页
+    getPage: async (params: any) => {
+        return await request.get({url: `system/${pathAndPermission}/page`, params})
+    },
+
+    // 查询详情
+    get: async (id: number) => {
+        return await request.get({url: `system/${pathAndPermission}/get?id=` + id})
+    },
+
+    // 新增$!{businessComment}
+    create: async (data: ${businessName}) => {
+        return await request.post({url: `system/${pathAndPermission}/create`, data})
+    },
+
+    // 修改$!{businessComment}
+    update: async (data: ${businessName}) => {
+        return await request.put({url: `system/${pathAndPermission}/update`, data})
+    },
+
+    // 删除$!{businessComment}
+    delete: async (id: number) => {
+        return await request.delete({url: `system/${pathAndPermission}/delete?id=` + id})
+    },
+
+
+    // 导出$!{businessComment} Excel
+    export: async (params) => {
+        return await request.download({url: `system/${pathAndPermission}/export-excel`, params})
+    },
+
+}

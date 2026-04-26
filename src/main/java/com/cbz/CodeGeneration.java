@@ -1,10 +1,14 @@
 package com.cbz;
 
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.generator.FastAutoGenerator;
+import com.baomidou.mybatisplus.generator.config.DataSourceConfig;
 import com.baomidou.mybatisplus.generator.config.OutputFile;
 import com.baomidou.mybatisplus.generator.config.builder.CustomFile;
+import com.baomidou.mybatisplus.generator.config.querys.MySqlQuery;
 import com.baomidou.mybatisplus.generator.config.rules.DateType;
 import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
 import com.baomidou.mybatisplus.generator.engine.VelocityTemplateEngine;
@@ -80,6 +84,22 @@ public class CodeGeneration {
     // sql输出路径
     private static final String SQL_FILE_PATH = "F:\\Code\\code-generator-mp\\src\\main\\java\\com\\cbz";
 
+    // Vue项目路径
+    private static final String FRONT_PATH = "F:\\CodeFront\\yudao-ui-admin-vue3";
+
+    // Vue源码路径
+    private static final String VUE_PATH = "\\src\\";
+
+    // api文件路径
+    private static final String API_PATH =  FRONT_PATH + VUE_PATH + "api\\system\\" + PACKAGE_COMMON;
+
+    // 页面文件路径
+    private static final String INDEX_PATH =  FRONT_PATH + VUE_PATH + "views\\system\\" + PACKAGE_COMMON;
+
+    // 表单文件路径
+    private static final String FORM_PATH =  FRONT_PATH + VUE_PATH + "views\\system\\" + PACKAGE_COMMON;
+
+
 
     /**
      * 根据表名生成相应结构代码
@@ -91,6 +111,8 @@ public class CodeGeneration {
         String pathAndPermission = "demo";
         // 业务前导名
         String schemaName = "";
+        // 查询字段
+        List<String> queryColumnList = ListUtil.of("name");
         FastAutoGenerator.create(DB_URL, DB_USER, DB_SECRET)
 
                 // 1、全局配置
@@ -149,13 +171,29 @@ public class CodeGeneration {
                 .injectionConfig(injectConfig -> {
                     String camelCaseName = StrUtil.toCamelCase(tableName);
                     String businessName = StrUtil.upperFirst(camelCaseName);
-                    // 预处理变量
+                    // 预处理注入变量
                     injectConfig.beforeOutputFile((tableInfo, objectMap) -> {
                         // 读取表注释并去掉末尾“表”字，例如“用户表” -> “用户”
                         String tableComment = StrUtil.blankToDefault(tableInfo.getComment(), businessName);
                         String businessComment = StrUtil.removeSuffix(tableComment.trim(), "表");
                         objectMap.put("tableComment", tableComment);
                         objectMap.put("businessComment", businessComment);
+
+                        // 额外变量注入
+                        tableInfo.getFields().forEach( o -> {
+                            String propertyNameLower = StrUtil.toLowerCase(o.getPropertyName());
+                            String htmlType = "input";
+                            if (propertyNameLower.contains("：")){
+                                htmlType = "select";
+                            }
+                            if (propertyNameLower.contains("time")){
+                                htmlType = "datetime";
+                            }
+                            if (propertyNameLower.contains("url")){
+                                htmlType = "imageUpload";
+                            }
+                            o.setCustomMap(MapUtil.of("htmlType", htmlType));
+                        });
                     });
 
 
@@ -168,6 +206,8 @@ public class CodeGeneration {
                     customMap.put("packageVo", PACKAGE_VO);
                     customMap.put("pathAndPermission", pathAndPermission);
                     customMap.put("schemaName", schemaName);
+                    customMap.put("queryColumnList", queryColumnList);
+                    customMap.put("minDistName", PACKAGE_COMMON);
 
 
                     injectConfig.customMap(customMap); //注入自定义属性
@@ -212,6 +252,34 @@ public class CodeGeneration {
                             .filePath(SQL_FILE_PATH)
                             .build());
                     injectConfig.customFile(customFileList);
+
+                    // 前端api
+                    customFileList.add(new CustomFile.Builder()
+                            .templatePath("/template/front/api.ts.vm")
+                            .formatNameFunction(tableInfo -> "index.ts") // 自定义文件名
+                            .fileName("")
+                            .filePath(API_PATH)
+                            .build());
+                    injectConfig.customFile(customFileList);
+
+                    // 前端页面
+                    customFileList.add(new CustomFile.Builder()
+                            .templatePath("/template/front/index.vue.vm")
+                            .formatNameFunction(tableInfo -> "index.vue") // 自定义文件名
+                            .fileName("")
+                            .filePath(INDEX_PATH)
+                            .build());
+                    injectConfig.customFile(customFileList);
+
+                    // 前端表单
+                    customFileList.add(new CustomFile.Builder()
+                            .templatePath("/template/front/form.vue.vm")
+                            .formatNameFunction(tableInfo ->   businessName + "Form.vue") // 自定义文件名
+                            .fileName("")
+                            .filePath(FORM_PATH)
+                            .build());
+                    injectConfig.customFile(customFileList);
+
 
                 })
                 // 6、模板引擎设置
